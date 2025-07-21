@@ -19,6 +19,8 @@ use Laravel\Sanctum\HasApiTokens;
  *     @OA\Property(property="created_at", type="string", format="date-time", readOnly=true),
  *     @OA\Property(property="updated_at", type="string", format="date-time", readOnly=true)
  * )
+ * @method static where(string $string, string|null $getEmail)
+ * @method static create(array $array)
  */
 class User extends Authenticatable
 {
