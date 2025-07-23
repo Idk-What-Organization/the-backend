@@ -8,10 +8,10 @@ use Laravel\Socialite\Contracts\User as SocialiteUser;
 class UserRepository
 {
     /**
-     * Buat user baru di database.
+     * Create a new user in the database.
      *
-     * @param  array  $data  Data yang telah divalidasi untuk pembuatan user.
-     * @return User  Instance user yang baru dibuat.
+     * @param  array  $data  Validated data for creating a user.
+     * @return User  The newly created user instance.
      */
     public function create(array $data): User
     {
@@ -19,12 +19,12 @@ class UserRepository
     }
 
     /**
-     * Temukan user berdasarkan email dari akun Google, atau buat baru jika belum ada.
-     * Jika user sudah ada, data nama dan google_id akan diperbarui.
-     * Jika user belum ada, akun baru akan dibuat lengkap dengan username unik.
+     * Find a user by their Google account email, or create a new one if not found.
+     * If the user exists, their name and google_id will be updated.
+     * If not, a new user will be created with a unique username.
      *
-     * @param SocialiteUser $googleUser Data user dari Google (via Socialite)
-     * @return User User yang ditemukan atau baru dibuat
+     * @param SocialiteUser $googleUser User data from Google (via Socialite).
+     * @return User The found or newly created user.
      */
     public function findOrCreateByGoogle(SocialiteUser $googleUser): User
     {

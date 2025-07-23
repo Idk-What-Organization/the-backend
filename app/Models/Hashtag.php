@@ -11,7 +11,7 @@ class Hashtag extends Model
     use HasFactory;
 
     /**
-     * Atribut yang dapat diisi secara massal.
+     * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
@@ -20,14 +20,14 @@ class Hashtag extends Model
     ];
 
     /**
-     * Menonaktifkan penggunaan kolom timestamps.
+     * Disable the use of timestamps.
      *
      * @var bool
      */
     public $timestamps = false;
 
     /**
-     * Relasi ke semua post yang menggunakan hashtag ini.
+     * Get all posts associated with this hashtag.
      *
      * @return BelongsToMany
      */

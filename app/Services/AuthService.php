@@ -13,7 +13,7 @@ class AuthService
     protected UserRepository $userRepository;
 
     /**
-     * Inisialisasi AuthService dengan UserRepository.
+     * Initialize AuthService with UserRepository.
      *
      * @param UserRepository $userRepository
      */
@@ -23,10 +23,10 @@ class AuthService
     }
 
     /**
-     * Proses logika bisnis untuk pendaftaran user baru.
+     * Handles the business logic for user registration.
      *
-     * @param array $data Data registrasi yang telah divalidasi.
-     * @return array{user: User, token: string}  User yang dibuat dan token autentikasi.
+     * @param array $data Validated registration data.
+     * @return array{user: User, token: string}  Created user and authentication token.
      */
     public function register(array $data): array
     {
@@ -40,10 +40,10 @@ class AuthService
     }
 
     /**
-     * Proses logika bisnis untuk login user.
+     * Handles the business logic for user login.
      *
-     * @param array $credentials Data login yang telah divalidasi.
-     * @return array{user: User, token: string}  User yang login dan token baru.
+     * @param array $credentials Validated login credentials.
+     * @return array{user: User, token: string}  Logged-in user and new token.
      * @throws ValidationException
      */
     public function login(array $credentials): array
@@ -52,7 +52,7 @@ class AuthService
 
         if (!Auth::attempt([$loginField => $credentials['identity'], 'password' => $credentials['password']])) {
             throw ValidationException::withMessages([
-                'identity' => ['Kredensial yang diberikan tidak cocok dengan data kami.'],
+                'identity' => ['The provided credentials do not match our records.'],
             ]);
         }
 

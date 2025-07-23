@@ -8,14 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Friendship extends Pivot
 {
     /**
-     * Menunjukkan bahwa primary key tidak auto-increment.
+     * Indicates that the primary key is not auto-incrementing.
      *
      * @var bool
      */
     public $incrementing = true;
 
     /**
-     * Atribut yang dapat diisi secara massal.
+     * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
@@ -26,7 +26,7 @@ class Friendship extends Pivot
     ];
 
     /**
-     * Relasi ke user yang mengirim permintaan.
+     * Get the user who sent the friend request.
      *
      * @return BelongsTo
      */
@@ -36,7 +36,7 @@ class Friendship extends Pivot
     }
 
     /**
-     * Relasi ke user yang menerima permintaan.
+     * Get the user who received the friend request.
      *
      * @return BelongsTo
      */

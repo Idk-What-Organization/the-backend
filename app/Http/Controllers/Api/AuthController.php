@@ -17,7 +17,7 @@ class AuthController extends Controller
     protected AuthService $authService;
 
     /**
-     * Inisialisasi AuthController dengan dependency AuthService.
+     * Initialize AuthController with AuthService dependency.
      *
      * @param AuthService $authService
      */
@@ -27,7 +27,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Registrasi user baru.
+     * Register a new user.
      *
      * @param RegisterRequest $request
      * @return JsonResponse
@@ -45,7 +45,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Login user.
+     * Authenticate a user and issue an access token.
      *
      * @param LoginRequest $request
      * @return JsonResponse
@@ -70,7 +70,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Redirect pengguna ke halaman autentikasi Google.
+     * Redirect the user to the Google authentication page.
      *
      * @return RedirectResponse
      */
@@ -80,7 +80,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Tangani callback setelah autentikasi Google selesai.
+     * Handle the callback after Google authentication.
      *
      * @return RedirectResponse
      */
