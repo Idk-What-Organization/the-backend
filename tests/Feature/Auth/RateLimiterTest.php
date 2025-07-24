@@ -34,7 +34,7 @@ class RateLimiterTest extends TestCase
     }
 
     /**
-     * Test to ensure attempts are blocked after reaching hourly limit.
+     * Test to ensure attempts are blocked after reaching the hourly limit.
      *
      * @return void
      */
@@ -61,7 +61,7 @@ class RateLimiterTest extends TestCase
     }
 
     /**
-     * Test to ensure rate limiter resets the counter after one minute.
+     * Test to ensure the rate limiter resets the counter after one minute.
      *
      * @return void
      */

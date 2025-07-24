@@ -242,6 +242,71 @@
                     }
                 }
             }
+        },
+        "/auth/google/redirect": {
+            "get": {
+                "tags": [
+                    "OAuth"
+                ],
+                "summary": "Redirect user to Google login page",
+                "description": "Endpoint ini akan mengarahkan user ke halaman login Google. Tidak bisa diakses melalui Swagger UI secara langsung.",
+                "operationId": "8db2d866f0ef71a14c25200cf175e77e",
+                "responses": {
+                    "302": {
+                        "description": "Redirect to Google login"
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Log out the currently authenticated user",
+                "operationId": "adca1304b2eae780ac36876f667bf036",
+                "responses": {
+                    "200": {
+                        "description": "Logout successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Success message returned after logout",
+                                            "type": "string",
+                                            "example": "Successfully logged out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Returned if the user is not authenticated",
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -570,6 +635,10 @@
         {
             "name": "Auth",
             "description": "Endpoint untuk autentikasi, registrasi, dan login user"
+        },
+        {
+            "name": "OAuth",
+            "description": "OAuth"
         }
     ]
 }

@@ -7,6 +7,7 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Services\AuthService;
 use App\Http\Requests\Auth\LoginRequest;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Laravel\Socialite\Facades\Socialite;
@@ -131,5 +132,19 @@ class AuthController extends Controller
         } catch (Exception $e) {
             return redirect('http://localhost:3000/login-failed?error=' . $e->getMessage());
         }
+    }
+
+    /**
+     * Log out the authenticated user.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function logout(Request $request): JsonResponse
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json([
+            'message' => 'Successfully logged out'
+        ]);
     }
 }

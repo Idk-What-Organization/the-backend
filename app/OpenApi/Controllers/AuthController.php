@@ -131,8 +131,59 @@ class AuthController
      *     )
      * )
      */
-
     public function login()
+    {
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/auth/google/redirect",
+     *     summary="Redirect user to Google login page",
+     *     tags={"OAuth"},
+     *     description="Endpoint ini akan mengarahkan user ke halaman login Google. Tidak bisa diakses melalui Swagger UI secara langsung.",
+     *     @OA\Response(
+     *         response=302,
+     *         description="Redirect to Google login"
+     *     )
+     * )
+     */
+    public function googleRedirect()
+    {
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/logout",
+     *     summary="Log out the currently authenticated user",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Logout successful",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Successfully logged out",
+     *                 description="Success message returned after logout"
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                 property="message",
+     *                 type="string",
+     *                 example="Unauthenticated.",
+     *                 description="Returned if the user is not authenticated"
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function logout()
     {
     }
 }
