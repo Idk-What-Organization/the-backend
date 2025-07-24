@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -34,7 +35,18 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        $result = $this->authService->register($request->validated());
+        $startTime = microtime(true); // <-- Mulai timer
+        Log::debug('AuthController: Register request received. Starting process...', [
+            'email' => $request->input('email')
+        ]);
+
+        $result = $this->authService->register($request->validated(), $startTime);
+        $totalTime = (microtime(true) - $startTime) * 1000;
+
+        Log::info('AuthController: User successfully registered.', [
+            'user_id' => $result['user']->id,
+            'total_duration_ms' => round($totalTime)
+        ]);
 
         return response()->json([
             'message' => 'User successfully registered',

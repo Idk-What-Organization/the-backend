@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Log;
 
 class AuthService
 {
@@ -28,9 +29,17 @@ class AuthService
      * @param array $data Validated registration data.
      * @return array{user: User, token: string}  Created user and authentication token.
      */
-    public function register(array $data): array
+    public function register(array $data, float $startTime): array
     {
-        $user = $this->userRepository->create($data);
+        $timeToService = (microtime(true) - $startTime) * 1000;
+        Log::debug('AuthService: Entered register method.', [
+            'duration_to_service_ms' => round($timeToService)
+        ]);
+
+        $user = $this->userRepository->create($data, $startTime);
+
+        Log::debug('AuthService: User object created, now generating token.');
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return [
