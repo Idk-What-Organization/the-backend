@@ -13,23 +13,34 @@ class AuthController
     /**
      * @OA\Post(
      *     path="/api/register",
-     *     summary="Registrasi user baru",
+     *     summary="Register a new user",
      *     tags={"Auth"},
      *     @OA\RequestBody(
      *         required=true,
-     *         description="Data untuk registrasi user baru",
+     *         description="Data for registering a new user",
      *         @OA\JsonContent(
      *             required={"name", "username", "email", "password", "password_confirmation"},
      *             @OA\Property(property="name", type="string", example="Andi Budi"),
      *             @OA\Property(property="username", type="string", example="andibudi"),
      *             @OA\Property(property="email", type="string", format="email", example="andi.budi@example.com"),
-     *             @OA\Property(property="password", type="string", format="password", example="password123"),
-     *             @OA\Property(property="password_confirmation", type="string", format="password", example="password123")
+     *             @OA\Property(
+     *                 property="password",
+     *                 type="string",
+     *                 format="password",
+     *                 example="P@ssw0rd123!",
+     *                 description="Password must be at least 8 characters long, and include uppercase, lowercase, number, and symbol."
+     *             ),
+     *             @OA\Property(
+     *                 property="password_confirmation",
+     *                 type="string",
+     *                 format="password",
+     *                 example="P@ssw0rd123!"
+     *             )
      *         )
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Registrasi Berhasil",
+     *         description="Registration Successful",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="User successfully registered"),
      *             @OA\Property(property="user", ref="#/components/schemas/UserAuth"),
@@ -39,9 +50,10 @@ class AuthController
      *     ),
      *     @OA\Response(
      *         response=422,
-     *         description="Error Validasi",
+     *         description="Validation Error",
      *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="The username has already been taken. (and 1 more error)"),
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validation Failed! Please check the data you submitted."),
      *             @OA\Property(
      *                 property="errors",
      *                 type="object",
@@ -54,7 +66,9 @@ class AuthController
      *     )
      * )
      */
-    public function register() {}
+    public function register()
+    {
+    }
 
     /**
      * @OA\Post(
@@ -97,5 +111,7 @@ class AuthController
      *     )
      * )
      */
-    public function login() {}
+    public function login()
+    {
+    }
 }

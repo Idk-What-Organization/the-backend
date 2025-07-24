@@ -17,10 +17,10 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Registrasi user baru",
+                "summary": "Register a new user",
                 "operationId": "bbf26d4d70399322bb78de720da1edd1",
                 "requestBody": {
-                    "description": "Data untuk registrasi user baru",
+                    "description": "Data for registering a new user",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -47,14 +47,15 @@
                                         "example": "andi.budi@example.com"
                                     },
                                     "password": {
+                                        "description": "Password must be at least 8 characters long, and include uppercase, lowercase, number, and symbol.",
                                         "type": "string",
                                         "format": "password",
-                                        "example": "password123"
+                                        "example": "P@ssw0rd123!"
                                     },
                                     "password_confirmation": {
                                         "type": "string",
                                         "format": "password",
-                                        "example": "password123"
+                                        "example": "P@ssw0rd123!"
                                     }
                                 },
                                 "type": "object"
@@ -64,7 +65,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Registrasi Berhasil",
+                        "description": "Registration Successful",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -91,14 +92,18 @@
                         }
                     },
                     "422": {
-                        "description": "Error Validasi",
+                        "description": "Validation Error",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
                                         "message": {
                                             "type": "string",
-                                            "example": "The username has already been taken. (and 1 more error)"
+                                            "example": "Validation Failed! Please check the data you submitted."
                                         },
                                         "errors": {
                                             "type": "object",
