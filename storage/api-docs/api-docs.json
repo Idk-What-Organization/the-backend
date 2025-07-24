@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://my-default-host.com",
+            "url": "http://127.0.0.1:8000",
             "description": "API Server Utama"
         }
     ],
@@ -17,10 +17,10 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Registrasi user baru",
+                "summary": "Register a new user",
                 "operationId": "bbf26d4d70399322bb78de720da1edd1",
                 "requestBody": {
-                    "description": "Data untuk registrasi user baru",
+                    "description": "Data for registering a new user",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -47,14 +47,15 @@
                                         "example": "andi.budi@example.com"
                                     },
                                     "password": {
+                                        "description": "Password must be at least 8 characters long, and include uppercase, lowercase, number, and symbol.",
                                         "type": "string",
                                         "format": "password",
-                                        "example": "password123"
+                                        "example": "P@ssw0rd123!"
                                     },
                                     "password_confirmation": {
                                         "type": "string",
                                         "format": "password",
-                                        "example": "password123"
+                                        "example": "P@ssw0rd123!"
                                     }
                                 },
                                 "type": "object"
@@ -64,7 +65,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Registrasi Berhasil",
+                        "description": "Registration Successful",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -74,7 +75,7 @@
                                             "example": "User successfully registered"
                                         },
                                         "user": {
-                                            "$ref": "#/components/schemas/User"
+                                            "$ref": "#/components/schemas/UserAuth"
                                         },
                                         "access_token": {
                                             "type": "string",
@@ -91,14 +92,18 @@
                         }
                     },
                     "422": {
-                        "description": "Error Validasi",
+                        "description": "Validation Error",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
                                         "message": {
                                             "type": "string",
-                                            "example": "The username has already been taken. (and 1 more error)"
+                                            "example": "Validation Failed! Please check the data you submitted."
                                         },
                                         "errors": {
                                             "type": "object",
@@ -167,10 +172,11 @@
                                             "example": "Login successful"
                                         },
                                         "user": {
-                                            "$ref": "#/components/schemas/User"
+                                            "$ref": "#/components/schemas/UserAuth"
                                         },
                                         "access_token": {
-                                            "type": "string"
+                                            "type": "string",
+                                            "example": "1|abcdef..."
                                         },
                                         "token_type": {
                                             "type": "string",
@@ -270,6 +276,39 @@
                         "items": {
                             "$ref": "#/components/schemas/Comment"
                         }
+                    }
+                },
+                "type": "object"
+            },
+            "Friendship": {
+                "title": "Friendship Model",
+                "description": "Pivot model yang merepresentasikan relasi pertemanan antar user.",
+                "required": [
+                    "user_id",
+                    "friend_id",
+                    "status"
+                ],
+                "properties": {
+                    "user_id": {
+                        "description": "ID dari user yang mengirim permintaan pertemanan",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "friend_id": {
+                        "description": "ID dari user yang menerima permintaan pertemanan",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "status": {
+                        "description": "Status pertemanan (e.g., pending, accepted, rejected)",
+                        "type": "string",
+                        "example": "accepted"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    },
+                    "friend": {
+                        "$ref": "#/components/schemas/User"
                     }
                 },
                 "type": "object"
@@ -454,6 +493,40 @@
                         "items": {
                             "$ref": "#/components/schemas/User"
                         }
+                    }
+                },
+                "type": "object"
+            },
+            "UserAuth": {
+                "title": "User Auth Schema",
+                "description": "Schema untuk response data user saat login atau registrasi.",
+                "required": [
+                    "id",
+                    "name",
+                    "username",
+                    "email"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ID unik user",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Nama lengkap user",
+                        "type": "string",
+                        "example": "Andi Budi"
+                    },
+                    "username": {
+                        "description": "Username unik user",
+                        "type": "string",
+                        "example": "andibudi"
+                    },
+                    "email": {
+                        "description": "Alamat email user",
+                        "type": "string",
+                        "format": "email",
+                        "example": "andi.budi@example.com"
                     }
                 },
                 "type": "object"

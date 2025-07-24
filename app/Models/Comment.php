@@ -12,7 +12,7 @@ class Comment extends Model
     use HasFactory;
 
     /**
-     * Atribut yang dapat diisi secara massal.
+     * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
@@ -24,7 +24,7 @@ class Comment extends Model
     ];
 
     /**
-     * Relasi ke user pemilik komentar.
+     * Get the user who owns the comment.
      *
      * @return BelongsTo
      */
@@ -34,7 +34,7 @@ class Comment extends Model
     }
 
     /**
-     * Relasi ke post tempat komentar ini dibuat.
+     * Get the post that this comment belongs to.
      *
      * @return BelongsTo
      */
@@ -44,7 +44,7 @@ class Comment extends Model
     }
 
     /**
-     * Relasi ke komentar balasan (jika ada).
+     * Get the replies to this comment (if any).
      *
      * @return HasMany
      */

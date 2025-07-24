@@ -1,5 +1,4 @@
 <?php
-// app/OpenApi/Schemas/HashtagSchema.php
 
 namespace App\OpenApi\Schemas;
 

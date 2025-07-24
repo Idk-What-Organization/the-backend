@@ -11,7 +11,7 @@ class PostImage extends Model
     use HasFactory;
 
     /**
-     * Menentukan atribut yang dapat diisi secara massal.
+     * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
@@ -21,14 +21,14 @@ class PostImage extends Model
     ];
 
     /**
-     * Menonaktifkan penggunaan kolom timestamps (created_at, updated_at).
+     * Disable the use of timestamp columns (created_at, updated_at).
      *
      * @var bool
      */
     public $timestamps = false;
 
     /**
-     * Relasi ke post sebagai pemilik gambar ini.
+     * Get the post that owns this image.
      *
      * @return BelongsTo
      */

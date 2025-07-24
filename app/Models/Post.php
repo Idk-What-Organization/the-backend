@@ -13,7 +13,7 @@ class Post extends Model
     use HasFactory;
 
     /**
-     * Atribut yang dapat diisi secara massal.
+     * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
@@ -23,7 +23,7 @@ class Post extends Model
     ];
 
     /**
-     * Relasi ke user pemilik post.
+     * Get the user who owns this post.
      *
      * @return BelongsTo
      */
@@ -33,7 +33,7 @@ class Post extends Model
     }
 
     /**
-     * Relasi ke gambar-gambar terkait post ini.
+     * Get the images associated with this post.
      *
      * @return HasMany
      */
@@ -43,7 +43,7 @@ class Post extends Model
     }
 
     /**
-     * Relasi ke komentar-komentar yang dibuat pada post ini.
+     * Get the comments made on this post.
      *
      * @return HasMany
      */
@@ -53,7 +53,7 @@ class Post extends Model
     }
 
     /**
-     * Relasi ke hashtag yang ditautkan dalam post ini.
+     * Get the hashtags attached to this post.
      *
      * @return BelongsToMany
      */
@@ -63,7 +63,7 @@ class Post extends Model
     }
 
     /**
-     * Relasi ke user yang menyukai post ini.
+     * Get the users who liked this post.
      *
      * @return BelongsToMany
      */

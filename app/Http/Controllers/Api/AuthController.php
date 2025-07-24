@@ -11,13 +11,14 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
     protected AuthService $authService;
 
     /**
-     * Inisialisasi AuthController dengan dependency AuthService.
+     * Initialize AuthController with AuthService dependency.
      *
      * @param AuthService $authService
      */
@@ -27,14 +28,25 @@ class AuthController extends Controller
     }
 
     /**
-     * Registrasi user baru.
+     * Register a new user.
      *
      * @param RegisterRequest $request
      * @return JsonResponse
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        $result = $this->authService->register($request->validated());
+        $startTime = microtime(true); // <-- Mulai timer
+        Log::debug('AuthController: Register request received. Starting process...', [
+            'email' => $request->input('email')
+        ]);
+
+        $result = $this->authService->register($request->validated(), $startTime);
+        $totalTime = (microtime(true) - $startTime) * 1000;
+
+        Log::info('AuthController: User successfully registered.', [
+            'user_id' => $result['user']->id,
+            'total_duration_ms' => round($totalTime)
+        ]);
 
         return response()->json([
             'message' => 'User successfully registered',
@@ -45,7 +57,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Login user.
+     * Authenticate a user and issue an access token.
      *
      * @param LoginRequest $request
      * @return JsonResponse
@@ -70,7 +82,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Redirect pengguna ke halaman autentikasi Google.
+     * Redirect the user to the Google authentication page.
      *
      * @return RedirectResponse
      */
@@ -80,7 +92,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Tangani callback setelah autentikasi Google selesai.
+     * Handle the callback after Google authentication.
      *
      * @return RedirectResponse
      */

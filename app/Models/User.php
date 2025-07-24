@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
- * @method static \Illuminate\Database\Eloquent\Builder|User where(string $column, mixed $value)
+ * @method static Builder|User where(string $column, mixed $value)
  * @method static User create(array $attributes)
  */
 class User extends Authenticatable
@@ -18,7 +20,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * Atribut yang dapat diisi secara massal.
+     * The attributes that are mass assignable.
      *
      * @var list<string>
      */
@@ -31,7 +33,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Atribut yang disembunyikan saat serialisasi model.
+     * The attributes that should be hidden for serialization.
      *
      * @var list<string>
      */
@@ -41,7 +43,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Casting atribut menjadi tipe data spesifik.
+     * The attributes that should be cast to specific types.
      *
      * @return array<string, string>
      */
@@ -54,7 +56,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Relasi ke semua post yang dibuat oleh user.
+     * Get all posts created by the user.
      *
      * @return HasMany
      */
@@ -64,7 +66,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Relasi ke semua komentar yang dibuat oleh user.
+     * Get all comments made by the user.
      *
      * @return HasMany
      */
@@ -74,7 +76,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Relasi ke semua post yang disukai oleh user.
+     * Get all posts liked by the user.
      *
      * @return BelongsToMany
      */
@@ -84,8 +86,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Relasi ke user yang ditambahkan sebagai teman oleh user ini.
-     * (permintaan dikirim oleh saya dan sudah diterima)
+     * Get all users this user has added as friends (sent request and accepted).
      *
      * @return BelongsToMany
      */
@@ -98,8 +99,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Relasi ke user yang menambahkan saya sebagai teman.
-     * (permintaan diterima oleh saya)
+     * Get all users who added this user as a friend (request accepted by this user).
      *
      * @return BelongsToMany
      */
@@ -112,11 +112,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Accessor untuk mendapatkan semua teman (gabungan dari kedua arah).
+     * Accessor to get all friends of this user (both directions merged).
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    public function getFriendsAttribute()
+    public function getFriendsAttribute(): Collection
     {
         if (!array_key_exists('friends', $this->relations)) {
             $friends = $this->friendsOfMine->merge($this->friendOf);
@@ -126,7 +126,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Relasi untuk permintaan pertemanan yang dikirim oleh user ini.
+     * Get all friend requests sent by this user.
      *
      * @return HasMany
      */
@@ -136,7 +136,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Relasi untuk permintaan pertemanan yang diterima oleh user ini.
+     * Get all friend requests received by this user.
      *
      * @return HasMany
      */

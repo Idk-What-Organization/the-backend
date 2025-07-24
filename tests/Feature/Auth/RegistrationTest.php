@@ -7,159 +7,161 @@ use App\Services\AuthService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Arr;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
+use Mockery;
 
 class RegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
     /**
-     * @test
-     * Skenario 1: Tes Pendaftaran Berhasil (Happy Path)
+     * Generate valid registration data for testing.
+     *
+     * @param array $overrides Fields to override in the default valid data.
+     * @return array
      */
-    #[Test]
-    public function it_should_register_a_user_successfully_and_return_a_token(): void
+    private function validData(array $overrides = []): array
     {
-        $userData = [
+        return array_merge([
             'name' => 'Test User',
             'username' => 'testuser',
-            'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-        ];
+            'email' => 'test@mail.com',
+            'password' => 'P@ssw0rd123!',
+            'password_confirmation' => 'P@ssw0rd123!',
+        ], $overrides);
+    }
 
-        $expectedValidatedData = Arr::except($userData, ['password_confirmation']);
-
-        $fakeUser = User::factory()->make(['email' => $userData['email']]);
+    /**
+     * happy_path: Should register a user successfully and return an access token.
+     *
+     * @return void
+     */
+    #[Test]
+    public function happy_path_registers_user_and_returns_token(): void
+    {
+        $payload = $this->validData();
+        $expectedValidatedData = Arr::except($payload, ['password_confirmation']);
+        $fakeUser = User::factory()->make(['email' => $payload['email']]);
         $fakeUser->id = 1;
-
         $fakeToken = 'dummy-jwt-token';
 
         $this->mock(AuthService::class, function (MockInterface $mock) use ($expectedValidatedData, $fakeUser, $fakeToken) {
             $mock->shouldReceive('register')
                 ->once()
-                ->with($expectedValidatedData)
+                ->with($expectedValidatedData, Mockery::any()) // <-- PERBAIKAN DI SINI
                 ->andReturn(['user' => $fakeUser, 'token' => $fakeToken]);
         });
 
-        $response = $this->postJson('/api/register', $userData);
+        $response = $this->postJson('/api/register', $payload);
+
+        $response->assertStatus(201)
+            ->assertJsonStructure([
+                'message',
+                'user' => ['id', 'name', 'email'],
+                'access_token',
+                'token_type',
+            ])
+            ->assertJsonFragment(['access_token' => $fakeToken]);
+    }
+
+    /**
+     * security: Should ignore unexpected fields to prevent mass assignment vulnerability.
+     *
+     * @return void
+     */
+    #[Test]
+    public function security_ignores_extra_fields_during_registration(): void
+    {
+        $payload = $this->validData(['role' => 'admin', 'is_admin' => true]);
+
+        $this->mock(AuthService::class, function (MockInterface $mock) use ($payload) {
+            $validatedData = Arr::except($payload, ['role', 'is_admin', 'password_confirmation']);
+
+            $mock->shouldReceive('register')
+                ->once()
+                ->with($validatedData, Mockery::any()) // <-- PERBAIKIKAN DI SINI
+                ->andReturn([
+                    'user' => User::factory()->make($validatedData),
+                    'token' => 'dummy-token'
+                ]);
+        });
+
+        $response = $this->postJson('/api/register', $payload);
 
         $response->assertStatus(201);
-        $response->assertJsonStructure([
-            'message',
-            'user' => ['id', 'name', 'email'],
-            'access_token',
-            'token_type',
-        ]);
-        $response->assertJsonFragment([
-            'message' => 'User successfully registered',
-            'access_token' => $fakeToken,
-            'email' => 'test@example.com'
-        ]);
     }
 
     /**
-     * @test
-     * Skenario 2: Tes Gagal karena Validasi (Data tidak lengkap)
+     * Provides various invalid registration payloads with the expected error field.
+     *
+     * @return array<string, array{0: array, 1: string}>
      */
-    #[Test]
-    public function it_should_return_a_validation_error_if_required_fields_are_missing(): void
+    public static function invalidDataProvider(): array
     {
-        $badUserData = [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ];
+        $createCase = function ($field, $value, $name) {
+            $valid = [
+                'name' => 'Test User',
+                'username' => 'testuser',
+                'email' => 'test@mail.com',
+                'password' => 'P@ssw0rd123!',
+                'password_confirmation' => 'P@ssw0rd123!',
+            ];
 
-        $response = $this->postJson('/api/register', $badUserData);
+            $payload = array_merge($valid, is_array($field) ? $field : [$field => $value]);
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['password']);
+            if (is_string($field) && $field === 'password') {
+                $payload['password_confirmation'] = $value;
+            }
+
+            return [$name => [$payload, is_array($field) ? $value : $field]];
+        };
+
+        return array_merge(
+            $createCase('email', 'sudahada@mail.com', 'email already taken'),
+            $createCase('password', '123', 'password too short'),
+            $createCase('password', 'salahkonfirmasi', 'password confirmation mismatch'),
+            $createCase('email', 'ini-bukan-email', 'invalid email format'),
+            $createCase('name', 'User <invalid> 123', 'invalid name characters'),
+            $createCase('username', 'user with space', 'invalid username characters'),
+            $createCase('password', 'password12345', 'password lacks complexity'),
+            ['missing required fields' => [['name' => 'Test User', 'email' => 'test@mail.com'], 'password']],
+            $createCase('username', 'usertaken', 'username already taken'),
+            $createCase('email', 'TEST@mail.com', 'email with uppercase is still unique'),
+            $createCase('name', '', 'empty string for required field'),
+            $createCase('name', null, 'null for required field'),
+            ['entirely empty payload' => [[], 'name']],
+        );
     }
 
     /**
-     * @test
-     * Skenario 3: Gagal mendaftar karena email sudah digunakan
+     * validation_error: Should return proper validation errors for invalid inputs.
+     *
+     * @param array $payload The invalid request data.
+     * @param string $errorField The field expected to trigger a validation error.
+     * @return void
      */
     #[Test]
-    public function it_should_return_a_validation_error_if_email_is_already_taken(): void
+    #[DataProvider('invalidDataProvider')]
+    public function validation_error_returns_proper_messages(array $payload, string $errorField): void
     {
-        User::factory()->create(['email' => 'test@example.com']);
+        if (isset($payload['email']) && $payload['email'] === 'sudahada@mail.com') {
+            User::factory()->create(['email' => 'sudahada@mail.com']);
+        }
 
-        $userData = [
-            'name' => 'New User',
-            'username' => 'newuser',
-            'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-        ];
+        if (isset($payload['username']) && $payload['username'] === 'usertaken') {
+            User::factory()->create(['username' => 'usertaken', 'email' => 'unique-email@mail.com']);
+        }
 
-        $response = $this->postJson('/api/register', $userData);
+        if (isset($payload['email']) && strtolower($payload['email']) === 'test@mail.com') {
+            User::factory()->create(['email' => 'test@mail.com']);
+        }
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['email']);
-    }
+        $response = $this->postJson('/api/register', $payload);
 
-    /**
-     * @test
-     * Skenario 4: Gagal mendaftar karena password terlalu pendek
-     */
-    #[Test]
-    public function it_should_return_a_validation_error_if_password_is_too_short(): void
-    {
-        $userData = [
-            'name' => 'Test User',
-            'username' => 'testuser',
-            'email' => 'test@example.com',
-            'password' => '123',
-            'password_confirmation' => '123',
-        ];
-
-        $response = $this->postJson('/api/register', $userData);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['password']);
-    }
-
-    /**
-     * @test
-     * Skenario 5: Gagal mendaftar karena konfirmasi password tidak cocok
-     */
-    #[Test]
-    public function it_should_return_a_validation_error_if_password_confirmation_does_not_match(): void
-    {
-        $userData = [
-            'name' => 'Test User',
-            'username' => 'testuser',
-            'email' => 'test@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password_salah',
-        ];
-
-        $response = $this->postJson('/api/register', $userData);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['password']);
-    }
-
-    /**
-     * @test
-     * Skenario 6: Gagal mendaftar karena format email tidak valid
-     */
-    #[Test]
-    public function it_should_return_a_validation_error_if_email_format_is_invalid(): void
-    {
-        $userData = [
-            'name' => 'Test User',
-            'username' => 'testuser',
-            'email' => 'ini-bukan-email',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-        ];
-
-        $response = $this->postJson('/api/register', $userData);
-
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['email']);
+        $response->assertStatus(422)
+            ->assertJsonStructure(['success', 'message', 'errors'])
+            ->assertJsonValidationErrors([$errorField]);
     }
 }

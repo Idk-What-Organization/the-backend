@@ -1,5 +1,4 @@
 <?php
-// app/OpenApi/Schemas/UserSchema.php
 
 namespace App\OpenApi\Schemas;
 

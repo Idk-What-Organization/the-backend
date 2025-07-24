@@ -7,13 +7,14 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Log;
 
 class AuthService
 {
     protected UserRepository $userRepository;
 
     /**
-     * Inisialisasi AuthService dengan UserRepository.
+     * Initialize AuthService with UserRepository.
      *
      * @param UserRepository $userRepository
      */
@@ -23,14 +24,22 @@ class AuthService
     }
 
     /**
-     * Proses logika bisnis untuk pendaftaran user baru.
+     * Handles the business logic for user registration.
      *
-     * @param array $data Data registrasi yang telah divalidasi.
-     * @return array{user: User, token: string}  User yang dibuat dan token autentikasi.
+     * @param array $data Validated registration data.
+     * @return array{user: User, token: string}  Created user and authentication token.
      */
-    public function register(array $data): array
+    public function register(array $data, float $startTime): array
     {
-        $user = $this->userRepository->create($data);
+        $timeToService = (microtime(true) - $startTime) * 1000;
+        Log::debug('AuthService: Entered register method.', [
+            'duration_to_service_ms' => round($timeToService)
+        ]);
+
+        $user = $this->userRepository->create($data, $startTime);
+
+        Log::debug('AuthService: User object created, now generating token.');
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return [
@@ -40,10 +49,10 @@ class AuthService
     }
 
     /**
-     * Proses logika bisnis untuk login user.
+     * Handles the business logic for user login.
      *
-     * @param array $credentials Data login yang telah divalidasi.
-     * @return array{user: User, token: string}  User yang login dan token baru.
+     * @param array $credentials Validated login credentials.
+     * @return array{user: User, token: string}  Logged-in user and new token.
      * @throws ValidationException
      */
     public function login(array $credentials): array
@@ -52,7 +61,7 @@ class AuthService
 
         if (!Auth::attempt([$loginField => $credentials['identity'], 'password' => $credentials['password']])) {
             throw ValidationException::withMessages([
-                'identity' => ['Kredensial yang diberikan tidak cocok dengan data kami.'],
+                'identity' => ['The provided credentials do not match our records.'],
             ]);
         }
 
