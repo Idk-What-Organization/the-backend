@@ -130,10 +130,10 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Login user",
+                "summary": "User login",
                 "operationId": "5ba9b5607f79b9095d3c5b333a194835",
                 "requestBody": {
-                    "description": "Login dengan email/username dan password",
+                    "description": "Login using email or username and password",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -144,15 +144,15 @@
                                 ],
                                 "properties": {
                                     "identity": {
-                                        "description": "Bisa diisi dengan email atau username",
+                                        "description": "Can be an email or a username",
                                         "type": "string",
-                                        "format": "email",
                                         "example": "andibudi"
                                     },
                                     "password": {
+                                        "description": "User's password",
                                         "type": "string",
                                         "format": "password",
-                                        "example": "password123"
+                                        "example": "P@ssw0rd123!"
                                     }
                                 },
                                 "type": "object"
@@ -162,7 +162,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Login Berhasil",
+                        "description": "Login successful",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -189,25 +189,50 @@
                         }
                     },
                     "422": {
-                        "description": "Kredensial tidak valid atau error validasi",
+                        "description": "Invalid credentials or validation error",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
                                         "message": {
                                             "type": "string",
-                                            "example": "Invalid credentials"
+                                            "example": "Validation failed! Please check the data you submitted."
                                         },
                                         "errors": {
                                             "type": "object",
                                             "example": {
                                                 "identity": [
-                                                    "The identity field is required."
-                                                ],
-                                                "password": [
-                                                    "The password must be at least 8 characters."
+                                                    "The provided credentials do not match our records."
                                                 ]
                                             }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too many login attempts (Rate Limit)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Too many requests. Please try again in 60 seconds."
+                                        },
+                                        "retry_after_seconds": {
+                                            "type": "string",
+                                            "example": "60"
                                         }
                                     },
                                     "type": "object"

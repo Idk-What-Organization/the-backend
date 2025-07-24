@@ -6,7 +6,13 @@ use App\Http\Controllers\Api\AuthController;
 
 
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])
+    ->middleware([
+        'throttle:login-tier1',
+        'throttle:login-tier2',
+        'throttle:login-tier3',
+    ])
+    ->name('login');
 
 Route::get('/auth/google/redirect', [AuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);

@@ -73,20 +73,31 @@ class AuthController
     /**
      * @OA\Post(
      *     path="/api/login",
-     *     summary="Login user",
+     *     summary="User login",
      *     tags={"Auth"},
      *     @OA\RequestBody(
      *         required=true,
-     *         description="Login dengan email/username dan password",
+     *         description="Login using email or username and password",
      *         @OA\JsonContent(
      *             required={"identity", "password"},
-     *             @OA\Property(property="identity", type="string", format="email", example="andibudi", description="Bisa diisi dengan email atau username"),
-     *             @OA\Property(property="password", type="string", format="password", example="password123")
+     *             @OA\Property(
+     *                 property="identity",
+     *                 type="string",
+     *                 example="andibudi",
+     *                 description="Can be an email or a username"
+     *             ),
+     *             @OA\Property(
+     *                 property="password",
+     *                 type="string",
+     *                 format="password",
+     *                 example="P@ssw0rd123!",
+     *                 description="User's password"
+     *             )
      *         )
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Login Berhasil",
+     *         description="Login successful",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="Login successful"),
      *             @OA\Property(property="user", ref="#/components/schemas/UserAuth"),
@@ -96,21 +107,31 @@ class AuthController
      *     ),
      *     @OA\Response(
      *         response=422,
-     *         description="Kredensial tidak valid atau error validasi",
+     *         description="Invalid credentials or validation error",
      *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Invalid credentials"),
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Validation failed! Please check the data you submitted."),
      *             @OA\Property(
      *                 property="errors",
      *                 type="object",
      *                 example={
-     *                     "identity": {"The identity field is required."},
-     *                     "password": {"The password must be at least 8 characters."}
+     *                     "identity": {"The provided credentials do not match our records."}
      *                 }
      *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=429,
+     *         description="Too many login attempts (Rate Limit)",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Too many requests. Please try again in 60 seconds."),
+     *             @OA\Property(property="retry_after_seconds", type="string", example="60")
      *         )
      *     )
      * )
      */
+
     public function login()
     {
     }

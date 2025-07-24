@@ -28,22 +28,23 @@ class AuthController extends Controller
     }
 
     /**
-     * Register a new user.
+     * Handle user registration request.
      *
      * @param RegisterRequest $request
      * @return JsonResponse
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        $startTime = microtime(true); // <-- Mulai timer
-        Log::debug('AuthController: Register request received. Starting process...', [
+        $startTime = microtime(true);
+
+        Log::debug('AuthController: Register request received.', [
             'email' => $request->input('email')
         ]);
 
         $result = $this->authService->register($request->validated(), $startTime);
         $totalTime = (microtime(true) - $startTime) * 1000;
 
-        Log::info('AuthController: User successfully registered.', [
+        Log::info('AuthController: User registered successfully.', [
             'user_id' => $result['user']->id,
             'total_duration_ms' => round($totalTime)
         ]);
@@ -57,15 +58,29 @@ class AuthController extends Controller
     }
 
     /**
-     * Authenticate a user and issue an access token.
+     * Handle user login request and issue access token.
      *
      * @param LoginRequest $request
      * @return JsonResponse
      */
     public function login(LoginRequest $request): JsonResponse
     {
+        $startTime = microtime(true);
+
+        Log::debug('AuthController: Login request received.', [
+            'identity' => $request->input('identity'),
+            'ip_address' => $request->ip()
+        ]);
+
         try {
-            $result = $this->authService->login($request->validated());
+            $result = $this->authService->login($request->validated(), $startTime);
+            $totalTime = (microtime(true) - $startTime) * 1000;
+
+            Log::info('AuthController: Login successful.', [
+                'user_id' => $result['user']->id,
+                'ip_address' => $request->ip(),
+                'duration_ms' => round($totalTime),
+            ]);
 
             return response()->json([
                 'message' => 'Login successful',
@@ -73,7 +88,17 @@ class AuthController extends Controller
                 'access_token' => $result['token'],
                 'token_type' => 'Bearer',
             ]);
+
         } catch (ValidationException $e) {
+            $durationToFailure = (microtime(true) - $startTime) * 1000;
+
+            Log::warning('AuthController: Login failed - invalid credentials.', [
+                'identity' => $request->input('identity'),
+                'ip_address' => $request->ip(),
+                'duration_ms' => round($durationToFailure),
+                'errors' => $e->errors(),
+            ]);
+
             return response()->json([
                 'message' => 'Invalid credentials',
                 'errors' => $e->errors(),
@@ -82,7 +107,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Redirect the user to the Google authentication page.
+     * Redirect user to Google OAuth page.
      *
      * @return RedirectResponse
      */

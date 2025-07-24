@@ -9,24 +9,25 @@ use Laravel\Socialite\Contracts\User as SocialiteUser;
 class UserRepository
 {
     /**
-     * Create a new user in the database.
+     * Create a new user in the database and log timing for diagnostics.
      *
-     * @param  array  $data  Validated data for creating a user.
-     * @return User  The newly created user instance.
+     * @param  array  $data       Validated user data.
+     * @param  float  $startTime  Time when the request handling started.
+     * @return User               The newly created user instance.
      */
     public function create(array $data, float $startTime): User
     {
         $timeToRepo = (microtime(true) - $startTime) * 1000;
-        Log::debug('UserRepository: Entered create method, preparing to query DB.', [
-            'duration_to_repo_ms' => round($timeToRepo)
+        Log::debug('UserRepository: Entering create method.', [
+            'duration_to_repo_ms' => round($timeToRepo),
         ]);
 
         $dbStartTime = microtime(true);
         $user = User::create($data);
         $dbQueryTime = (microtime(true) - $dbStartTime) * 1000;
 
-        Log::debug('UserRepository: Database INSERT executed.', [
-            'db_query_duration_ms' => round($dbQueryTime)
+        Log::debug('UserRepository: User created in database.', [
+            'db_query_duration_ms' => round($dbQueryTime),
         ]);
 
         return $user;
