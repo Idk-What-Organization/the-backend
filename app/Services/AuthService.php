@@ -102,7 +102,7 @@ class AuthService
      */
     public function handleGoogleLogin(): array
     {
-        $googleUser = Socialite::driver('google')->user();
+        $googleUser = Socialite::driver('google')->stateless()->user();
         $user = $this->userRepository->findOrCreateByGoogle($googleUser);
         $token = $user->createToken('auth_token')->plainTextToken;
 
