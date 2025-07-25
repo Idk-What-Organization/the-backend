@@ -2,13 +2,13 @@
     "openapi": "3.0.0",
     "info": {
         "title": "API IDK",
-        "description": "Dokumentasi API untuk endpoint IDK-API.",
+        "description": "API documentation for the IDK-API endpoints.",
         "version": "1.0.0"
     },
     "servers": [
         {
             "url": "http://127.0.0.1:8000",
-            "description": "API Server Utama"
+            "description": "Main API Server"
         }
     ],
     "paths": {
@@ -20,7 +20,7 @@
                 "summary": "Register a new user",
                 "operationId": "bbf26d4d70399322bb78de720da1edd1",
                 "requestBody": {
-                    "description": "Data for registering a new user",
+                    "description": "Data required to register a new user",
                     "required": true,
                     "content": {
                         "application/json": {
@@ -47,7 +47,7 @@
                                         "example": "andi.budi@example.com"
                                     },
                                     "password": {
-                                        "description": "Password must be at least 8 characters long, and include uppercase, lowercase, number, and symbol.",
+                                        "description": "Must be at least 8 characters and include uppercase, lowercase, number, and symbol.",
                                         "type": "string",
                                         "format": "password",
                                         "example": "P@ssw0rd123!"
@@ -65,7 +65,7 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Registration Successful",
+                        "description": "Registration successful",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -92,7 +92,7 @@
                         }
                     },
                     "422": {
-                        "description": "Validation Error",
+                        "description": "Validation failed",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -130,7 +130,7 @@
                 "tags": [
                     "Auth"
                 ],
-                "summary": "User login",
+                "summary": "Log in a user",
                 "operationId": "5ba9b5607f79b9095d3c5b333a194835",
                 "requestBody": {
                     "description": "Login using email or username and password",
@@ -217,7 +217,7 @@
                         }
                     },
                     "429": {
-                        "description": "Too many login attempts (Rate Limit)",
+                        "description": "Too many login attempts",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -249,7 +249,7 @@
                     "OAuth"
                 ],
                 "summary": "Redirect user to Google login page",
-                "description": "Endpoint ini akan mengarahkan user ke halaman login Google. Tidak bisa diakses melalui Swagger UI secara langsung.",
+                "description": "This endpoint redirects the user to the Google login page. It cannot be executed directly from Swagger UI.",
                 "operationId": "8db2d866f0ef71a14c25200cf175e77e",
                 "responses": {
                     "302": {
@@ -273,7 +273,6 @@
                                 "schema": {
                                     "properties": {
                                         "message": {
-                                            "description": "Success message returned after logout",
                                             "type": "string",
                                             "example": "Successfully logged out"
                                         }
@@ -290,7 +289,6 @@
                                 "schema": {
                                     "properties": {
                                         "message": {
-                                            "description": "Returned if the user is not authenticated",
                                             "type": "string",
                                             "example": "Unauthenticated."
                                         }
@@ -306,6 +304,109 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/api/users/{username}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get a user's profile information",
+                "description": "Fetch public profile data for a specific user by their username. This is a public endpoint and does not require authentication.",
+                "operationId": "0076309ca4a09b38edd63261f5dede9d",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "The username of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "andibudi"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Andi Budi"
+                                                },
+                                                "username": {
+                                                    "type": "string",
+                                                    "example": "andibudi"
+                                                },
+                                                "bio": {
+                                                    "type": "string",
+                                                    "example": "Hello, world! This is my bio."
+                                                },
+                                                "joined_at": {
+                                                    "type": "string",
+                                                    "example": "July 25, 2025"
+                                                },
+                                                "photos": {
+                                                    "properties": {
+                                                        "profile": {
+                                                            "type": "string",
+                                                            "example": "url/to/profile.jpg"
+                                                        },
+                                                        "cover": {
+                                                            "type": "string",
+                                                            "example": "url/to/cover.jpg"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "stats": {
+                                                    "properties": {
+                                                        "posts_count": {
+                                                            "type": "integer",
+                                                            "example": 15
+                                                        },
+                                                        "friends_count": {
+                                                            "type": "integer",
+                                                            "example": 42
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     },
@@ -625,7 +726,7 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "description": "Masukkan token JWT dengan format: Bearer {token}",
+                "description": "Enter JWT token in the format: Bearer {token}",
                 "bearerFormat": "JWT",
                 "scheme": "bearer"
             }
@@ -634,7 +735,11 @@
     "tags": [
         {
             "name": "Auth",
-            "description": "Endpoint untuk autentikasi, registrasi, dan login user"
+            "description": "Endpoints for user authentication, registration, login, and logout"
+        },
+        {
+            "name": "User",
+            "description": "Endpoints for managing user data"
         },
         {
             "name": "OAuth",

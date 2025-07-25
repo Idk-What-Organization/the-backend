@@ -34,7 +34,7 @@ class UserRepository
     }
 
     /**
-     * Find a user by their Google account email, or create a new one if not found.
+     * Find a user by their Google account email or create a new one if not found.
      * If the user exists, their name and google_id will be updated.
      * If not, a new user will be created with a unique username.
      *
@@ -62,5 +62,19 @@ class UserRepository
             'google_id' => $googleUser->getId(),
             'password' => bcrypt(str()->random(16)),
         ]);
+    }
+
+    /**
+     * Find a user by username along with related data needed for the profile.
+     * Uses withCount for query efficiency.
+     *
+     * @param string $username
+     * @return User|null
+     */
+    public function findByUsernameWithCounts(string $username): ?User
+    {
+        return User::where('username', $username)
+            ->withCount(['posts', 'friendsOfMine', 'friendOf'])
+            ->first();
     }
 }
