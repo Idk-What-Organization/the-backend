@@ -114,7 +114,7 @@ class AuthController extends Controller
      */
     public function redirectToGoogle(): RedirectResponse
     {
-        return Socialite::driver('google')->redirect();
+        return Socialite::driver('google')->stateless()->redirect();
     }
 
     /**
@@ -127,10 +127,14 @@ class AuthController extends Controller
         try {
             $result = $this->authService->handleGoogleLogin();
 
-            return redirect('http://localhost:3000/login-success?token=' . $result['token']);
+            return redirect('http://localhost:5173/login-success?token=' . $result['token']);
 
         } catch (Exception $e) {
-            return redirect('http://localhost:3000/login-failed?error=' . $e->getMessage());
+            Log::error('AuthController: Google login failed.', [
+                'error_message' => $e->getMessage(),
+            ]);
+
+            return redirect('http://localhost:5173/login-failed');
         }
     }
 
