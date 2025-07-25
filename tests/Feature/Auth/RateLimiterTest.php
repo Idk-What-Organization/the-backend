@@ -12,7 +12,7 @@ class RateLimiterTest extends TestCase
     use DatabaseMigrations;
 
     /**
-     * Test to ensure login attempts are blocked after too many failures.
+     * Ensure login attempts are blocked after too many failures.
      *
      * @return void
      */
@@ -34,7 +34,7 @@ class RateLimiterTest extends TestCase
     }
 
     /**
-     * Test to ensure attempts are blocked after reaching the hourly limit.
+     * Ensure attempts are blocked after reaching the hourly limit.
      *
      * @return void
      */
@@ -42,6 +42,7 @@ class RateLimiterTest extends TestCase
     public function it_blocks_attempts_based_on_the_hourly_limit(): void
     {
         $user = User::factory()->create();
+
         $payload = [
             'identity' => $user->email,
             'password' => 'password_salah',
@@ -61,7 +62,7 @@ class RateLimiterTest extends TestCase
     }
 
     /**
-     * Test to ensure the rate limiter resets the counter after one minute.
+     * Ensure the rate limiter resets the counter after one minute.
      *
      * @return void
      */
@@ -69,6 +70,7 @@ class RateLimiterTest extends TestCase
     public function it_resets_the_counter_after_one_minute(): void
     {
         $user = User::factory()->create();
+
         $payload = [
             'identity' => $user->email,
             'password' => 'password_salah',
@@ -86,7 +88,7 @@ class RateLimiterTest extends TestCase
     }
 
     /**
-     * Test to ensure different users from the same IP are not blocked.
+     * Ensure different users from the same IP are not blocked.
      *
      * @return void
      */
@@ -113,5 +115,31 @@ class RateLimiterTest extends TestCase
         ];
 
         $this->postJson('/api/login', $payloadUserB)->assertStatus(422);
+    }
+
+    /**
+     * Ensure custom message is returned when rate limited.
+     *
+     * @return void
+     */
+    #[Test]
+    public function it_returns_custom_message_when_rate_limited(): void
+    {
+        $user = User::factory()->create();
+
+        for ($i = 0; $i < 6; $i++) {
+            $this->postJson('/api/login', [
+                'identity' => $user->email,
+                'password' => 'wrong-password',
+            ]);
+        }
+
+        $response = $this->postJson('/api/login', [
+            'identity' => $user->email,
+            'password' => 'wrong-password',
+        ]);
+
+        $response->assertStatus(429)
+            ->assertJsonStructure(['success', 'message', 'retry_after_seconds']);
     }
 }
