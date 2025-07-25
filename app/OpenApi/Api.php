@@ -6,12 +6,12 @@ namespace App\OpenApi;
  * @OA\Info(
  *     version="1.0.0",
  *     title="API IDK",
- *     description="Dokumentasi API untuk endpoint IDK-API."
+ *     description="API documentation for the IDK-API endpoints."
  * )
  *
  * @OA\Server(
  *     url=L5_SWAGGER_CONST_HOST,
- *     description="API Server Utama"
+ *     description="Main API Server"
  * )
  *
  * @OA\SecurityScheme(
@@ -19,7 +19,7 @@ namespace App\OpenApi;
  *     type="http",
  *     scheme="bearer",
  *     bearerFormat="JWT",
- *     description="Masukkan token JWT dengan format: Bearer {token}"
+ *     description="Enter JWT token in the format: Bearer {token}"
  * )
  */
 class Api

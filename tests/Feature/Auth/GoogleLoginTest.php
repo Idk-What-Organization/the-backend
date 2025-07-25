@@ -26,9 +26,9 @@ class GoogleLoginTest extends TestCase
         $fakeGoogleUser->shouldReceive('getName')->andReturn('Google User');
         $fakeGoogleUser->shouldReceive('getEmail')->andReturn('googleuser@example.com');
 
-        Socialite::shouldReceive('driver->user')->andReturn($fakeGoogleUser);
+        Socialite::shouldReceive('driver->stateless->user')->andReturn($fakeGoogleUser);
 
-        $response = $this->get('/api/auth/google/callback');
+        $response = $this->get('/auth/google/callback');
 
         $this->assertDatabaseHas('users', [
             'email' => 'googleuser@example.com',
@@ -36,7 +36,7 @@ class GoogleLoginTest extends TestCase
         ]);
 
         $response->assertStatus(302);
-        $response->assertRedirectContains('http://localhost:3000/login-success?token=');
+        $response->assertRedirectContains('http://localhost:5173/login-success?token=');
     }
 
     /**
@@ -53,9 +53,9 @@ class GoogleLoginTest extends TestCase
         $fakeGoogleUser->shouldReceive('getName')->andReturn('Google User');
         $fakeGoogleUser->shouldReceive('getEmail')->andReturn('googleuser@example.com');
 
-        Socialite::shouldReceive('driver->user')->andReturn($fakeGoogleUser);
+        Socialite::shouldReceive('driver->stateless->user')->andReturn($fakeGoogleUser);
 
-        $response = $this->get('/api/auth/google/callback');
+        $response = $this->get('/auth/google/callback');
 
         $this->assertDatabaseCount('users', 1);
         $this->assertDatabaseHas('users', [
@@ -64,6 +64,6 @@ class GoogleLoginTest extends TestCase
         ]);
 
         $response->assertStatus(302);
-        $response->assertRedirectContains('http://localhost:3000/login-success?token=');
+        $response->assertRedirectContains('http://localhost:5173/login-success?token=');
     }
 }

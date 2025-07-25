@@ -133,7 +133,6 @@ class AuthController extends Controller
             Log::error('AuthController: Google login failed.', [
                 'error_message' => $e->getMessage(),
             ]);
-
             return redirect('http://localhost:5173/login-failed');
         }
     }
