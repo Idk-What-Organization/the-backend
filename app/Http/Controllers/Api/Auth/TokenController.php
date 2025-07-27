@@ -8,16 +8,15 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 
 class TokenController extends Controller
 {
-
     /**
      * Refresh a token.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function refresh(): JsonResponse
     {
         try {
-            $token = auth()->refresh();
+            $token = auth('api')->refresh();
         } catch (JWTException $e) {
             return response()->json(['message' => 'Could not refresh token, please log in again.'], 401);
         }
@@ -29,14 +28,14 @@ class TokenController extends Controller
      * Get the token array structure.
      *
      * @param string $token
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     protected function respondWithToken(string $token): JsonResponse
     {
         return response()->json([
             'access_token' => $token,
-            'token_type' => 'Bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'token_type'   => 'Bearer',
+            'expires_in'   => config('jwt.ttl') * 60
         ]);
     }
 }
