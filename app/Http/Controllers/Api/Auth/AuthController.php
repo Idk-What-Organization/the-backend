@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Auth;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\RegisterRequest;
-use App\Services\AuthService;
-use App\Http\Requests\Auth\LoginRequest;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -26,36 +26,6 @@ class AuthController extends Controller
     public function __construct(AuthService $authService)
     {
         $this->authService = $authService;
-    }
-
-    /**
-     * Handle user registration request.
-     *
-     * @param RegisterRequest $request
-     * @return JsonResponse
-     */
-    public function register(RegisterRequest $request): JsonResponse
-    {
-        $startTime = microtime(true);
-
-        Log::debug('AuthController: Register request received.', [
-            'email' => $request->input('email')
-        ]);
-
-        $result = $this->authService->register($request->validated(), $startTime);
-        $totalTime = (microtime(true) - $startTime) * 1000;
-
-        Log::info('AuthController: User registered successfully.', [
-            'user_id' => $result['user']->id,
-            'total_duration_ms' => round($totalTime)
-        ]);
-
-        return response()->json([
-            'message' => 'User successfully registered',
-            'user' => $result['user'],
-            'access_token' => $result['token'],
-            'token_type' => 'Bearer',
-        ], 201);
     }
 
     /**
@@ -74,7 +44,9 @@ class AuthController extends Controller
         ]);
 
         try {
-            $result = $this->authService->login($request->validated(), $startTime);
+            $validatedData = $request->validated();
+            $rememberMe = $validatedData['remember_me'] ?? false;
+            $result = $this->authService->login($validatedData, $startTime, $rememberMe);
             $totalTime = (microtime(true) - $startTime) * 1000;
 
             Log::info('AuthController: Login successful.', [
@@ -143,12 +115,17 @@ class AuthController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function logout(Request $request): JsonResponse
+    public function logout(): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::guard('api')->logout();
 
         return response()->json([
             'message' => 'Successfully logged out',
         ]);
+    }
+
+    public function me(): JsonResponse
+    {
+        return response()->json(auth()->user());
     }
 }

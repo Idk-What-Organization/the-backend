@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Auth\Events\Registered;
 
 class AuthService
 {
@@ -28,9 +29,9 @@ class AuthService
      *
      * @param array $data Validated registration data.
      * @param float $startTime Time when the request handling started.
-     * @return array{user: User, token: string} Created user and authentication token.
+     * @return User Created user.
      */
-    public function register(array $data, float $startTime): array
+    public function register(array $data, float $startTime): User
     {
         $timeToService = (microtime(true) - $startTime) * 1000;
         Log::debug('AuthService: Entered register method.', [
@@ -38,13 +39,17 @@ class AuthService
         ]);
 
         $user = $this->userRepository->create($data, $startTime);
-        Log::debug('AuthService: User object created, generating auth token.');
-        $token = $user->createToken('auth_token')->plainTextToken;
 
-        return [
-            'user' => $user,
-            'token' => $token,
-        ];
+        // ======================= TAMBAHKAN BLOK INI =======================
+        // Atur timestamp saat email verifikasi pertama akan dikirim
+        $user->last_verification_email_sent_at = now();
+        $user->save();
+        // ==================================================================
+
+        Log::debug('AuthService: User object created, firing Registered event.');
+        event(new Registered($user));
+
+        return $user;
     }
 
     /**
@@ -55,7 +60,7 @@ class AuthService
      * @return array{user: User, token: string} Logged-in user and authentication token.
      * @throws ValidationException When credentials are invalid.
      */
-    public function login(array $credentials, float $startTime): array
+    public function login(array $credentials, float $startTime, bool $rememberMe = false): array
     {
         $timeToService = (microtime(true) - $startTime) * 1000;
         Log::debug('AuthService: Entered login method.', [
@@ -83,7 +88,21 @@ class AuthService
 
         /** @var User $user */
         $user = Auth::user();
-        $token = $user->createToken('auth_token')->plainTextToken;
+
+        if (!$user->hasVerifiedEmail()) {
+            throw ValidationException::withMessages([
+                'email' => ['Your email address is not verified. Please check your email for a verification link.'],
+            ]);
+        }
+
+        // Set TTL for the access token based on rememberMe flag
+        if ($rememberMe) {
+            Auth::guard('api')->factory()->setTTL(10080); // 7 days
+        } else {
+            Auth::guard('api')->factory()->setTTL(60); // 1 hour
+        }
+
+        $token = Auth::guard('api')->login($user);
 
         return [
             'user' => $user,
@@ -104,11 +123,28 @@ class AuthService
     {
         $googleUser = Socialite::driver('google')->stateless()->user();
         $user = $this->userRepository->findOrCreateByGoogle($googleUser);
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = Auth::guard('api')->login($user);
 
         return [
             'user' => $user,
             'token' => $token,
         ];
+    }
+
+    /**
+     * Resend the email verification notification to the user.
+     *
+     * @param string $email
+     * @return User
+     * @throws ValidationException
+     */
+    public function resendVerificationEmail(string $email): User
+    {
+        $user = $this->userRepository->findByEmail($email);
+        $user->last_verification_email_sent_at = now();
+        $user->save();
+        $user->sendEmailVerificationNotification();
+
+        return $user;
     }
 }

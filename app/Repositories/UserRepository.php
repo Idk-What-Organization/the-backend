@@ -65,16 +65,40 @@ class UserRepository
     }
 
     /**
-     * Find a user by username along with related data needed for the profile.
-     * Uses withCount for query efficiency.
+     * Retrieve a user by username with additional related data for profile display.
      *
-     * @param string $username
-     * @return User|null
+     * Performs a case-insensitive match and includes counts of posts and friendships.
+     *
+     * @param string $username The username to search for.
+     * @return User|null The user object with relationship counts or null if not found.
      */
     public function findByUsernameWithCounts(string $username): ?User
     {
-        return User::where('username', $username)
-            ->withCount(['posts', 'friendsOfMine', 'friendOf'])
+        return User::withCount(['posts', 'friendsOfMine', 'friendOf'])
+            ->whereRaw('LOWER(username) = ?', [strtolower($username)])
             ->first();
+    }
+
+    /**
+     * Update data user berdasarkan ID.
+     *
+     * @param int $userId
+     * @param array $data
+     * @return bool
+     */
+    public function update(int $userId, array $data): bool
+    {
+        return User::where('id', $userId)->update($data);
+    }
+
+    /**
+     * Find a user by their email address.
+     *
+     * @param string $email The email address to search for.
+     * @return User|null The user object or null if not found.
+     */
+    public function findByEmail(string $email): ?User
+    {
+        return User::where('email', $email)->first();
     }
 }

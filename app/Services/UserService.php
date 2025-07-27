@@ -12,10 +12,12 @@ class UserService
     }
 
     /**
-     * Retrieve profile data for a user by username.
+     * Retrieve the public profile data of a user by their username.
      *
-     * @param string $username
-     * @return User|null
+     * This includes user info and counts of related data like posts and friends.
+     *
+     * @param string $username The username of the user to retrieve.
+     * @return User|null The user model with profile data, or null if not found.
      */
     public function getProfileByUsername(string $username): ?User
     {

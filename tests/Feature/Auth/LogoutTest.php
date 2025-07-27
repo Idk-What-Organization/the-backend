@@ -7,6 +7,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
+use Tymon\JWTAuth\Facades\JWTAuth;
+
 class LogoutTest extends TestCase
 {
     use RefreshDatabase;
@@ -20,11 +22,7 @@ class LogoutTest extends TestCase
     public function an_authenticated_user_can_log_out(): void
     {
         $user = User::factory()->create();
-        $token = $user->createToken('test-token')->plainTextToken;
-
-        $this->assertDatabaseHas('personal_access_tokens', [
-            'tokenable_id' => $user->id,
-        ]);
+        $token = JWTAuth::fromUser($user);
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
@@ -33,9 +31,10 @@ class LogoutTest extends TestCase
         $response->assertStatus(200)
             ->assertJson(['message' => 'Successfully logged out']);
 
-        $this->assertDatabaseMissing('personal_access_tokens', [
-            'tokenable_id' => $user->id,
-        ]);
+        // Verify that the token is invalidated (cannot be used again)
+        $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->postJson('/api/user')->assertStatus(401);
     }
 
     /**
@@ -75,7 +74,7 @@ class LogoutTest extends TestCase
     public function user_cannot_logout_twice_with_same_token(): void
     {
         $user = User::factory()->create();
-        $token = $user->createToken('token')->plainTextToken;
+        $token = JWTAuth::fromUser($user);
 
         $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
@@ -97,15 +96,21 @@ class LogoutTest extends TestCase
     public function logout_only_deletes_current_token(): void
     {
         $user = User::factory()->create();
-        $token1 = $user->createToken('token1')->plainTextToken;
-        $token2 = $user->createToken('token2')->plainTextToken;
+        $token1 = JWTAuth::fromUser($user);
+        $token2 = JWTAuth::fromUser($user);
 
         $this->withHeaders([
             'Authorization' => 'Bearer ' . $token1,
         ])->postJson('/api/logout')->assertStatus(200);
 
-        $this->assertDatabaseHas('personal_access_tokens', [
-            'name' => 'token2',
-        ]);
+        // Verify that token1 is invalidated
+        $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token1,
+        ])->postJson('/api/user')->assertStatus(401);
+
+        // Verify that token2 is still valid (if JWTAuth allows multiple active tokens, which it does by default)
+        $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token2,
+        ])->postJson('/api/user')->assertStatus(200);
     }
 }

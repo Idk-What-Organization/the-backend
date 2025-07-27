@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+class UpdateProfileRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -18,14 +17,14 @@ class LoginRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'identity' => 'required|string',
-            'password' => 'required|string',
-            'remember_me' => 'boolean',
+            'name' => 'sometimes|string|max:255',
+            'bio' => 'sometimes|string|nullable|max:1000',
+            // Tambahkan validasi untuk field lain jika ada
         ];
     }
 }
