@@ -6,6 +6,11 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -18,8 +23,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->api(prepend: [
+            // \Tymon\JWTAuth\Http\Middleware\Authenticate::class, // Dihapus dari sini
+        ]);
     })
+    ->withProviders([
+        App\Providers\EventServiceProvider::class,
+    ])
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->stopIgnoring(ValidationException::class);
         $exceptions->report(function (ValidationException $e) {
@@ -56,6 +66,50 @@ return Application::configure(basePath: dirname(__DIR__))
                     'message'   => 'Validation Failed! Please check the data you submitted.',
                     'errors'    => $e->errors(),
                 ], 422);
+            }
+            return null;
+        });
+
+        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Resource not found.',
+                ], 404);
+            }
+            return null;
+        });
+
+        $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Method not allowed.',
+                ], 405);
+            }
+            return null;
+        });
+
+        $exceptions->render(function (UnauthorizedHttpException $e, Request $request) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => $e->getMessage(),
+                ], 401);
+            }
+            return null;
+        });
+
+        $exceptions->render(function (Throwable $e, Request $request) {
+            if ($request->wantsJson()) {
+                Log::error('Internal Server Error', [
+                    'exception' => get_class($e),
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+
+                return response()->json([
+                    'message' => 'Internal Server Error.',
+                ], 500);
             }
             return null;
         });

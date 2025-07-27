@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\UserProfileResource;
+use App\Http\Resources\Profile\PrivateUserProfileResource;
+use App\Http\Resources\Profile\PublicUserProfileResource;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 
@@ -14,12 +15,15 @@ class UserController extends Controller
     }
 
     /**
-     * Display the user profile by username.
+     * Display the profile of a user by username.
      *
-     * @param string $username
-     * @return UserProfileResource|JsonResponse
+     * Returns a private profile if the authenticated user is the same as the profile owner,
+     * otherwise returns a public version of the profile.
+     *
+     * @param string $username The username of the user whose profile is to be displayed.
+     * @return JsonResponse|PrivateUserProfileResource|PublicUserProfileResource
      */
-    public function show(string $username): UserProfileResource|JsonResponse
+    public function show(string $username): JsonResponse|PrivateUserProfileResource|PublicUserProfileResource
     {
         $user = $this->userService->getProfileByUsername($username);
 
@@ -27,6 +31,8 @@ class UserController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        return new UserProfileResource($user);
+        return auth()->id() === $user->id
+            ? new PrivateUserProfileResource($user)
+            : new PublicUserProfileResource($user);
     }
 }

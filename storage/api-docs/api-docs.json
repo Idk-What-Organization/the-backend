@@ -12,126 +12,13 @@
         }
     ],
     "paths": {
-        "/api/register": {
-            "post": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Register a new user",
-                "operationId": "bbf26d4d70399322bb78de720da1edd1",
-                "requestBody": {
-                    "description": "Data required to register a new user",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name",
-                                    "username",
-                                    "email",
-                                    "password",
-                                    "password_confirmation"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "example": "Andi Budi"
-                                    },
-                                    "username": {
-                                        "type": "string",
-                                        "example": "andibudi"
-                                    },
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email",
-                                        "example": "andi.budi@example.com"
-                                    },
-                                    "password": {
-                                        "description": "Must be at least 8 characters and include uppercase, lowercase, number, and symbol.",
-                                        "type": "string",
-                                        "format": "password",
-                                        "example": "P@ssw0rd123!"
-                                    },
-                                    "password_confirmation": {
-                                        "type": "string",
-                                        "format": "password",
-                                        "example": "P@ssw0rd123!"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Registration successful",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "User successfully registered"
-                                        },
-                                        "user": {
-                                            "$ref": "#/components/schemas/UserAuth"
-                                        },
-                                        "access_token": {
-                                            "type": "string",
-                                            "example": "1|abcdef..."
-                                        },
-                                        "token_type": {
-                                            "type": "string",
-                                            "example": "Bearer"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation failed",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Validation Failed! Please check the data you submitted."
-                                        },
-                                        "errors": {
-                                            "type": "object",
-                                            "example": {
-                                                "username": [
-                                                    "The username has already been taken."
-                                                ],
-                                                "email": [
-                                                    "The email has already been taken."
-                                                ]
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/login": {
+        "/api/v1/auth/login": {
             "post": {
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Log in a user",
-                "operationId": "5ba9b5607f79b9095d3c5b333a194835",
+                "operationId": "cbdfadcef7f207ff45cb910b604cee12",
                 "requestBody": {
                     "description": "Login using email or username and password",
                     "required": true,
@@ -153,6 +40,11 @@
                                         "type": "string",
                                         "format": "password",
                                         "example": "P@ssw0rd123!"
+                                    },
+                                    "remember_me": {
+                                        "description": "Set to true to keep the user logged in for a longer period (e.g., 7 days).",
+                                        "type": "boolean",
+                                        "example": true
                                     }
                                 },
                                 "type": "object"
@@ -176,7 +68,7 @@
                                         },
                                         "access_token": {
                                             "type": "string",
-                                            "example": "1|abcdef..."
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL3YxL2F1dGgvbG9naW4iLCJpYXQiOjE2NzgyMzU2NzgsImV4cCI6MTY3ODIzOTI3OCwibmJmIjoxNjc4MjM1Njc4LCJqdGkiOiJkZDU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YiIsInN1YiI6IjEiLCJwcnYyM2JkNTYwZjQ3ZTRjNzViYzY1NDIwYzBhYmYzNTczZTI3YjkwNDg1In0.some_jwt_token_here"
                                         },
                                         "token_type": {
                                             "type": "string",
@@ -243,14 +135,14 @@
                 }
             }
         },
-        "/auth/google/redirect": {
+        "/api/auth/google/redirect": {
             "get": {
                 "tags": [
-                    "OAuth"
+                    "Auth"
                 ],
                 "summary": "Redirect user to Google login page",
                 "description": "This endpoint redirects the user to the Google login page. It cannot be executed directly from Swagger UI.",
-                "operationId": "8db2d866f0ef71a14c25200cf175e77e",
+                "operationId": "ddd21b402e1cf7ac59ae0ef2b8b780ab",
                 "responses": {
                     "302": {
                         "description": "Redirect to Google login"
@@ -258,13 +150,13 @@
                 }
             }
         },
-        "/api/logout": {
+        "/api/v1/auth/logout": {
             "post": {
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Log out the currently authenticated user",
-                "operationId": "adca1304b2eae780ac36876f667bf036",
+                "operationId": "917952c141436d0f69042ffa1e8bea74",
                 "responses": {
                     "200": {
                         "description": "Logout successful",
@@ -306,83 +198,657 @@
                 ]
             }
         },
-        "/api/users/{username}": {
+        "/api/v1/auth/me": {
             "get": {
                 "tags": [
-                    "User"
+                    "Auth"
                 ],
-                "summary": "Get a user's profile information",
-                "description": "Fetch public profile data for a specific user by their username. This is a public endpoint and does not require authentication.",
-                "operationId": "0076309ca4a09b38edd63261f5dede9d",
-                "parameters": [
-                    {
-                        "name": "username",
-                        "in": "path",
-                        "description": "The username of the user",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
-                        "example": "andibudi"
-                    }
-                ],
+                "summary": "Get the authenticated user's details",
+                "operationId": "48edfbcda2f0c384729f7c66a8b34685",
                 "responses": {
                     "200": {
-                        "description": "Successful operation",
+                        "description": "User details retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserAuth"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "data": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "name": {
-                                                    "type": "string",
-                                                    "example": "Andi Budi"
-                                                },
-                                                "username": {
-                                                    "type": "string",
-                                                    "example": "andibudi"
-                                                },
-                                                "bio": {
-                                                    "type": "string",
-                                                    "example": "Hello, world! This is my bio."
-                                                },
-                                                "joined_at": {
-                                                    "type": "string",
-                                                    "example": "July 25, 2025"
-                                                },
-                                                "photos": {
-                                                    "properties": {
-                                                        "profile": {
-                                                            "type": "string",
-                                                            "example": "url/to/profile.jpg"
-                                                        },
-                                                        "cover": {
-                                                            "type": "string",
-                                                            "example": "url/to/cover.jpg"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                },
-                                                "stats": {
-                                                    "properties": {
-                                                        "posts_count": {
-                                                            "type": "integer",
-                                                            "example": 15
-                                                        },
-                                                        "friends_count": {
-                                                            "type": "integer",
-                                                            "example": 42
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "type": "object"
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/email/verify/{id}/{hash}": {
+            "get": {
+                "tags": [
+                    "Email Verification"
+                ],
+                "summary": "Verify user email address",
+                "operationId": "9b721c83160b3307b27436062a7f7303",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "hash",
+                        "in": "path",
+                        "description": "Verification hash",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email verified successfully!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Email verified successfully!"
+                                        },
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL3YxL2F1dGgvbG9naW4iLCJpYXQiOjE2NzgyMzU2NzgsImV4cCI6MTY3ODIzOTI3OCwibmJmIjoxNjc4MjM1Njc4LCJqdGkiOiJkZDU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YiIsInN1YiI6IjEiLCJwcnYyM2JkNTYwZjQ3ZTRjNzViYzY1NDIwYzBhYmYzNTczZTI3YjkwNDg1In0.some_jwt_token_here"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid verification link.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Invalid verification link."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Email already verified.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Email already verified."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/email/resend/{user}": {
+            "get": {
+                "tags": [
+                    "Email Verification"
+                ],
+                "summary": "Resend email verification link without authentication",
+                "operationId": "e0bb14d9c6d1293bc247dc18f72a7940",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "User ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A new verification link has been sent to your email.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "A new verification link has been sent to your email."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/email/resend-verification": {
+            "post": {
+                "tags": [
+                    "Email Verification"
+                ],
+                "summary": "Resend email verification link",
+                "operationId": "cff665b45d56a732e530c0b46a53133b",
+                "requestBody": {
+                    "description": "Email address to resend verification link to",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Email verifikasi telah berhasil dikirim ulang.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Email verifikasi telah berhasil dikirim ulang."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Gagal mengirim ulang email verifikasi."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": [
+                                                    "The email field is required."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Terjadi kesalahan server saat mencoba mengirim ulang email verifikasi."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/email/verification-notification": {
+            "post": {
+                "tags": [
+                    "Email Verification"
+                ],
+                "summary": "Send email verification notification to authenticated user",
+                "operationId": "41f7a4e292c0c7ea7421c60ffd8bf255",
+                "responses": {
+                    "200": {
+                        "description": "A new verification link has been sent to your email address.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "A new verification link has been sent to your email address."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too many requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Too many requests. Please try again in 60 seconds."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/profile": {
+            "put": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update the authenticated user's profile",
+                "operationId": "ec4d89d8f6ddc94a262b1fec57a8b625",
+                "requestBody": {
+                    "description": "Data to update user profile",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Andi Budi Updated"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "andibudi_updated"
+                                    },
+                                    "bio": {
+                                        "type": "string",
+                                        "example": "Updated bio for Andi Budi.",
+                                        "nullable": true
+                                    },
+                                    "website": {
+                                        "type": "string",
+                                        "format": "url",
+                                        "example": "https://updated.example.com",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profile updated successfully"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/UserAuth"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "username": [
+                                                    "The username has already been taken."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register a new user",
+                "operationId": "b4eafac359b473fe321c8f62d091bbd6",
+                "requestBody": {
+                    "description": "Data required to register a new user",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "username",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Andi Budi"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "andibudi"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "andi.budi@example.com"
+                                    },
+                                    "password": {
+                                        "description": "Must be at least 8 characters and include uppercase, lowercase, number, and symbol.",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "P@ssw0rd123!"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "P@ssw0rd123!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Registration successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User successfully registered"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/UserAuth"
+                                        },
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL3YxL2F1dGgvbG9naW4iLCJpYXQiOjE2NzgyMzU2NzgsImV4cCI6MTY3ODIzOTI3OCwibmJmIjoxNjc4MjM1Njc4LCJqdGkiOiJkZDU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YiIsInN1YiI6IjEiLCJwcnYyM2JkNTYwZjQ3ZTRjNzViYzY1NDIwYzBhYmYzNTczZTI3YjkwNDg1In0.some_jwt_token_here"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Validation Failed! Please check the data you submitted."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "username": [
+                                                    "The username has already been taken."
+                                                ],
+                                                "email": [
+                                                    "The email has already been taken."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/token/refresh": {
+            "post": {
+                "tags": [
+                    "Token"
+                ],
+                "summary": "Refresh an expired access token",
+                "operationId": "3a71cb53a3856e2f77bf8b7ff01ed677",
+                "responses": {
+                    "200": {
+                        "description": "Token refreshed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL3YxL2F1dGgvbG9naW4iLCJpYXQiOjE2NzgyMzU2NzgsImV4cCI6MTY3ODIzOTI3OCwibmJmIjoxNjc4MjM1Njc4LCJqdGkiOiJkZDU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YiIsInN1YiI6IjEiLCJwcnYyM2JkNTYwZjQ3ZTRjNzViYzY1NDIwYzBhYmYzNTczZTI3YjkwNDg1In0.some_jwt_token_here"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "expires_in": {
+                                            "description": "Token expiration in seconds",
+                                            "type": "integer",
+                                            "example": 3600
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Could not refresh token, please log in again.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Could not refresh token, please log in again."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/users/{username}": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Display the profile of a user by username",
+                "operationId": "3c953d7a9e9cb91c3c5dbe815abe0074",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "path",
+                        "description": "The username of the user whose profile is to be displayed.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User profile retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User profile retrieved successfully"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/UserAuth"
                                         }
                                     },
                                     "type": "object"
@@ -406,7 +872,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         }
     },
@@ -688,6 +1159,76 @@
                 },
                 "type": "object"
             },
+            "PrivateUserProfile": {
+                "title": "Private User Profile",
+                "description": "Full profile data visible only to the user themselves",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "username": {
+                        "type": "string",
+                        "example": "john_doe"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "john@example.com"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+628123456789"
+                    },
+                    "bio": {
+                        "type": "string",
+                        "example": "Developer and coffee lover"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T00:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-06-01T00:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "PublicUserProfile": {
+                "title": "Public User Profile",
+                "description": "Profile data visible to other users",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "username": {
+                        "type": "string",
+                        "example": "john_doe"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "bio": {
+                        "type": "string",
+                        "example": "Developer and coffee lover"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T00:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
             "UserAuth": {
                 "title": "User Auth Schema",
                 "description": "Schema untuk response data user saat login atau registrasi.",
@@ -738,12 +1279,20 @@
             "description": "Endpoints for user authentication, registration, login, and logout"
         },
         {
-            "name": "User",
-            "description": "Endpoints for managing user data"
+            "name": "Email Verification",
+            "description": "Endpoints for email verification"
         },
         {
-            "name": "OAuth",
-            "description": "OAuth"
+            "name": "Profile",
+            "description": "Endpoints for user profile management"
+        },
+        {
+            "name": "Token",
+            "description": "Endpoints for token management"
+        },
+        {
+            "name": "User",
+            "description": "Endpoints for user information"
         }
     ]
 }
