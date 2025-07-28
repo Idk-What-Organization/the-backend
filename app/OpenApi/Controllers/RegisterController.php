@@ -31,10 +31,7 @@ class RegisterController
      *         response=201,
      *         description="Registration successful",
      *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="User successfully registered"),
-     *             @OA\Property(property="user", ref="#/components/schemas/UserAuth"),
-     *             @OA\Property(property="access_token", type="string", example="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL3YxL2F1dGgvbG9naW4iLCJpYXQiOjE2NzgyMzU2NzgsImV4cCI6MTY3ODIzOTI3OCwibmJmIjoxNjc4MjM1Njc4LCJqdGkiOiJkZDU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YiIsInN1YiI6IjEiLCJwcnYyM2JkNTYwZjQ3ZTRjNzViYzY1NDIwYzBhYmYzNTczZTI3YjkwNDg1In0.some_jwt_token_here"),
-     *             @OA\Property(property="token_type", type="string", example="Bearer")
+     *             @OA\Property(property="message", type="string", example="Registration successful. Please check your email to verify your account."),
      *         )
      *     ),
      *     @OA\Response(
@@ -47,6 +44,15 @@ class RegisterController
      *                 "username": {"The username has already been taken."},
      *                 "email": {"The email has already been taken."}
      *             })
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=429,
+     *         description="Too Many Requests",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Too many requests. Please try again in 52 seconds."),
+     *             @OA\Property(property="retry_after_seconds", type="integer", example=52)
      *         )
      *     )
      * )

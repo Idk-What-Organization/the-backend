@@ -21,6 +21,8 @@ class User extends Authenticatable implements MustVerifyEmail, JWTSubject
 {
     use HasFactory, Notifiable;
 
+    public mixed $id;
+
     /**
      * Send the email verification notification.
      *

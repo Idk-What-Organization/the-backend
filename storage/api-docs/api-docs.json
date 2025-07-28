@@ -708,18 +708,7 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "User successfully registered"
-                                        },
-                                        "user": {
-                                            "$ref": "#/components/schemas/UserAuth"
-                                        },
-                                        "access_token": {
-                                            "type": "string",
-                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL3YxL2F1dGgvbG9naW4iLCJpYXQiOjE2NzgyMzU2NzgsImV4cCI6MTY3ODIzOTI3OCwibmJmIjoxNjc4MjM1Njc4LCJqdGkiOiJkZDU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YjU2YiIsInN1YiI6IjEiLCJwcnYyM2JkNTYwZjQ3ZTRjNzViYzY1NDIwYzBhYmYzNTczZTI3YjkwNDg1In0.some_jwt_token_here"
-                                        },
-                                        "token_type": {
-                                            "type": "string",
-                                            "example": "Bearer"
+                                            "example": "Registration successful. Please check your email to verify your account."
                                         }
                                     },
                                     "type": "object"
@@ -751,6 +740,30 @@
                                                     "The email has already been taken."
                                                 ]
                                             }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Too many requests. Please try again in 52 seconds."
+                                        },
+                                        "retry_after_seconds": {
+                                            "type": "integer",
+                                            "example": 52
                                         }
                                     },
                                     "type": "object"
